@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: clinica-agendamentos
+  datasource:
+    url: jdbc:postgresql://localhost:5433/clinica
+    username: clinica
+    password: clinica_dev_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

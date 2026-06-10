@@ -1,4 +1,4 @@
-package com.clinica.agendamentos.dto;
+package com.clinica.agendamentos.user.dto;
 
 import com.clinica.agendamentos.user.Role;
 import java.time.OffsetDateTime;

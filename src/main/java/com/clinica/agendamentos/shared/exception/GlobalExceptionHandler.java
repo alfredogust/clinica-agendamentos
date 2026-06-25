@@ -1,6 +1,8 @@
 package com.clinica.agendamentos.shared.exception;
 
-import com.clinica.agendamentos.user.EmailAlreadyExistsException;
+import java.time.Instant;
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,8 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.Instant;
-import java.util.List;
+import com.clinica.agendamentos.professional.ProfessionalNotFoundException;
+import com.clinica.agendamentos.user.EmailAlreadyExistsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -17,6 +19,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
         return conflict(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProfessionalNotFoundException.class)
+    public ResponseEntity<ApiError> handleProfessionalNotFound(ProfessionalNotFoundException ex) {
+        return notFound(ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -38,5 +45,10 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ApiError> conflict(String message) {
         ApiError error = new ApiError(Instant.now(), HttpStatus.CONFLICT.value(), message, List.of());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    private ResponseEntity<ApiError> notFound(String message) {
+        ApiError error = new ApiError(Instant.now(), HttpStatus.NOT_FOUND.value(), message, List.of());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

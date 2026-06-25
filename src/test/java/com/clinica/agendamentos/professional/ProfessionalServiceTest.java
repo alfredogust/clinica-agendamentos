@@ -1,9 +1,12 @@
 package com.clinica.agendamentos.professional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +39,6 @@ class ProfessionalServiceTest {
 
     @Test
     void shouldRegisterProfessionalWhenEmailIsNew() {
-        // Implement test logic for registering a professional
         CreateProfessionalRequest request = new CreateProfessionalRequest("Dr. John Doe", "drjohndoe@gmail.com", "plainPassword", Specialty.GENERAL_SURGERY);
         User savedUser = new User("Dr. John Doe", "drjohndoe@gmail.com", "hashedPassword", Role.PROFESSIONAL);
 
@@ -52,6 +54,26 @@ class ProfessionalServiceTest {
         assertEquals("Dr. John Doe", response.user().name());
         assertEquals(Specialty.GENERAL_SURGERY, response.specialty());
         assertEquals(Role.PROFESSIONAL, response.user().role());
+    }
+
+@Test
+    void shouldThrowExceptionWhenIdDoesNotExist() {
+        when(professionalRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ProfessionalNotFoundException.class, () -> professionalService.getById(999L));
+}
+
+    @Test
+    void shouldReturnProfessionalWhenIdExists() {
+        User user = new User("Dra. Ana", "ana@clinica.com", "hashedPassword", Role.PROFESSIONAL);
+        Professional professional = new Professional(user, Specialty.GENERAL_SURGERY);
+
+        when(professionalRepository.findById(888L)).thenReturn(Optional.of(professional));
+
+        ProfessionalResponse response = professionalService.getById(888L);
+
+        assertNotNull(response);
+        assertEquals(Specialty.GENERAL_SURGERY, response.specialty());
     }
 
     @Test

@@ -20,12 +20,13 @@ public class ProfessionalService {
     private final ProfessionalRepository professionalRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfessionalService(UserRepository userRepository, ProfessionalRepository professionalRepository, PasswordEncoder passwordEncoder) {
+    public ProfessionalService(UserRepository userRepository, ProfessionalRepository professionalRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.professionalRepository = professionalRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    
+
     @Transactional
     public ProfessionalResponse register(CreateProfessionalRequest request) {
         if (userRepository.existsByEmail(request.email())) {
@@ -38,19 +39,24 @@ public class ProfessionalService {
                 request.name(),
                 request.email(),
                 passwordHash,
-                Role.PROFESSIONAL
-        );
-        
+                Role.PROFESSIONAL);
+
         User savedUser = userRepository.save(user);
 
         Professional professional = new Professional(
-            savedUser,
-            request.specialty()
-        );
+                savedUser,
+                request.specialty());
 
         Professional savedProfessional = professionalRepository.save(professional);
-        
+
         return toResponse(savedProfessional);
+    }
+
+    public ProfessionalResponse getById(Long id) {
+        Professional professional = professionalRepository.findById(id)
+                .orElseThrow(() -> new ProfessionalNotFoundException(id));
+
+        return toResponse(professional);
     }
 
     private ProfessionalResponse toResponse(Professional professional) {
@@ -60,13 +66,11 @@ public class ProfessionalService {
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getCreatedAt()
-        );
+                user.getCreatedAt());
         return new ProfessionalResponse(
                 professional.getId(),
                 userResponse,
                 professional.getSpecialty(),
-                professional.getCreatedAt()
-        );
+                professional.getCreatedAt());
     }
 }

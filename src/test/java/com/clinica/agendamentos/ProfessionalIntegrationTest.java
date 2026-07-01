@@ -3,11 +3,15 @@ package com.clinica.agendamentos;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.clinica.agendamentos.professional.ProfessionalNotFoundException;
 import com.clinica.agendamentos.professional.ProfessionalService;
@@ -16,8 +20,6 @@ import com.clinica.agendamentos.professional.dto.CreateProfessionalRequest;
 import com.clinica.agendamentos.professional.dto.ProfessionalResponse;
 import com.clinica.agendamentos.user.EmailAlreadyExistsException;
 import com.clinica.agendamentos.user.Role;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
@@ -72,5 +74,28 @@ class ProfessionalIntegrationTest {
     @Test
     void shouldThrowExceptionWhenIdDoesNotExist() {
         assertThrows(ProfessionalNotFoundException.class, () -> professionalService.getById(999L));
+    }
+
+    @Test
+    void shouldReturnAllProfessionals() {
+        CreateProfessionalRequest request1 = new CreateProfessionalRequest("Carlos Guimas", "carlostis@gmail.com",
+                "plainPassword", Specialty.GENERAL_SURGERY);
+
+        CreateProfessionalRequest request2 = new CreateProfessionalRequest("Miguel Braz", "brazmuig@gmail.com",
+                "plainPassword", Specialty.OBSTETRICS_AND_GYNECOLOGY);
+
+        professionalService.register(request1);
+        professionalService.register(request2);
+
+        List<ProfessionalResponse> response = professionalService.findAll();
+
+        assertEquals(2, response.size());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoProfessionals() {
+        List<ProfessionalResponse> response = professionalService.findAll();
+
+        assertTrue(response.isEmpty());
     }
 }

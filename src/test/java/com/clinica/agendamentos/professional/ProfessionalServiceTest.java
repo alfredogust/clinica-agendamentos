@@ -3,9 +3,11 @@ package com.clinica.agendamentos.professional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -84,5 +86,33 @@ class ProfessionalServiceTest {
         when(userRepository.existsByEmail("drjohndoe@gmail.com")).thenReturn(true);
 
         assertThrows(EmailAlreadyExistsException.class, () -> professionalService.register(request));
+    }
+
+    @Test
+    void shouldReturnAllProfessionals() {
+        User user1 = new User("Dra. Ana", "ana@clinica.com", "hash", Role.PROFESSIONAL);
+        Professional professional1 = new Professional(user1, Specialty.GENERAL_SURGERY);
+
+        User user2 = new User("Dr. Joab", "joab@clinica.com", "hash", Role.PROFESSIONAL);
+        Professional professional2 = new Professional(user2, Specialty.ANESTHESIOLOGY);
+
+        List<Professional> professionals = List.of(professional1, professional2);
+
+        when(professionalRepository.findAll()).thenReturn(professionals);
+
+        List<ProfessionalResponse> response = professionalService.findAll();
+
+        assertEquals(2, response.size());
+        assertEquals("Dra. Ana", response.get(0).user().name());
+        assertEquals("Dr. Joab", response.get(1).user().name());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoProfessionals() {
+        when(professionalRepository.findAll()).thenReturn(List.of());
+
+        List<ProfessionalResponse> response = professionalService.findAll();
+
+        assertTrue(response.isEmpty());
     }
 }

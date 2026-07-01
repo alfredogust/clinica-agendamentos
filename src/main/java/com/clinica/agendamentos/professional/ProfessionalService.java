@@ -62,9 +62,9 @@ public class ProfessionalService {
 
     public List<ProfessionalResponse> findAll() {
         return professionalRepository.findAll()
-        .stream()
-        .map(professional -> toResponse(professional))
-        .toList();
+                .stream()
+                .map(professional -> toResponse(professional))
+                .toList();
     }
 
     private ProfessionalResponse toResponse(Professional professional) {

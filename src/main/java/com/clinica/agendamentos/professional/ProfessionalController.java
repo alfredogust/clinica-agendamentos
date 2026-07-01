@@ -1,6 +1,7 @@
 package com.clinica.agendamentos.professional;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,13 @@ public class ProfessionalController {
     @GetMapping("/{id}")
     public ResponseEntity<ProfessionalResponse> getById(@PathVariable Long id) {
         ProfessionalResponse response = professionalService.getById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProfessionalResponse>> findAll() {
+        List<ProfessionalResponse> response = professionalService.findAll();
 
         return ResponseEntity.ok(response);
     }

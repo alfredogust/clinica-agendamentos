@@ -1,7 +1,10 @@
 package com.clinica.agendamentos.professional;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.clinica.agendamentos.professional.dto.CreateProfessionalRequest;
 import com.clinica.agendamentos.professional.dto.ProfessionalResponse;
@@ -10,8 +13,6 @@ import com.clinica.agendamentos.user.Role;
 import com.clinica.agendamentos.user.User;
 import com.clinica.agendamentos.user.UserRepository;
 import com.clinica.agendamentos.user.dto.UserResponse;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProfessionalService {
@@ -57,6 +58,13 @@ public class ProfessionalService {
                 .orElseThrow(() -> new ProfessionalNotFoundException(id));
 
         return toResponse(professional);
+    }
+
+    public List<ProfessionalResponse> findAll() {
+        return professionalRepository.findAll()
+        .stream()
+        .map(professional -> toResponse(professional))
+        .toList();
     }
 
     private ProfessionalResponse toResponse(Professional professional) {

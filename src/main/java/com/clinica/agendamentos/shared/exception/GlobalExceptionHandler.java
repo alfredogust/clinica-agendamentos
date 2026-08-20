@@ -10,8 +10,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.clinica.agendamentos.appointment.AppointmentConflictException;
 import com.clinica.agendamentos.professional.ProfessionalNotFoundException;
 import com.clinica.agendamentos.user.EmailAlreadyExistsException;
+import com.clinica.agendamentos.user.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,6 +42,16 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
                 "Validation failed", fieldErrors);
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiError> handleUserNotFound(UserNotFoundException ex) {
+        return notFound(ex.getMessage());
+    }
+
+    @ExceptionHandler(AppointmentConflictException.class)
+    public ResponseEntity<ApiError> handleAppointmentConflict(AppointmentConflictException ex) {
+        return conflict(ex.getMessage());
     }
 
     private ResponseEntity<ApiError> conflict(String message) {

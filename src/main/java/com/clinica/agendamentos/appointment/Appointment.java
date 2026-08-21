@@ -9,6 +9,8 @@ import com.clinica.agendamentos.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,9 +46,18 @@ public class Appointment {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private AppointmentStatus status;
+
     public Appointment (Professional professional, User patient, OffsetDateTime startTime) {
         this.professional = professional;
         this.patient = patient;
         this.startTime = startTime;
+        this.status = AppointmentStatus.SCHEDULED;
+    }
+
+    public void cancel() {
+        this.status = AppointmentStatus.CANCELLED;
     }
 }

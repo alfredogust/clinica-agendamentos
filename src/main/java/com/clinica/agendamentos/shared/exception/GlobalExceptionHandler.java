@@ -10,7 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.clinica.agendamentos.appointment.AppointmentAlreadyCancelledException;
 import com.clinica.agendamentos.appointment.AppointmentConflictException;
+import com.clinica.agendamentos.appointment.AppointmentNotFoundException;
 import com.clinica.agendamentos.professional.ProfessionalNotFoundException;
 import com.clinica.agendamentos.user.EmailAlreadyExistsException;
 import com.clinica.agendamentos.user.UserNotFoundException;
@@ -54,6 +56,16 @@ public class GlobalExceptionHandler {
         return conflict(ex.getMessage());
     }
 
+     @ExceptionHandler(AppointmentNotFoundException.class)
+    public ResponseEntity<ApiError> handleAppointmentNotFound(AppointmentNotFoundException ex) {
+        return notFound(ex.getMessage());
+    }
+
+    @ExceptionHandler(AppointmentAlreadyCancelledException.class)
+    public ResponseEntity<ApiError> handleAppointmentAlreadyCancelled(AppointmentAlreadyCancelledException ex) {
+        return conflict(ex.getMessage());
+    }
+
     private ResponseEntity<ApiError> conflict(String message) {
         ApiError error = new ApiError(Instant.now(), HttpStatus.CONFLICT.value(), message, List.of());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
@@ -63,4 +75,5 @@ public class GlobalExceptionHandler {
         ApiError error = new ApiError(Instant.now(), HttpStatus.NOT_FOUND.value(), message, List.of());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
 }

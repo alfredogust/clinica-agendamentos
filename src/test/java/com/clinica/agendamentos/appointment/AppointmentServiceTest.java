@@ -73,9 +73,9 @@ class AppointmentServiceTest {
     void shouldThrowWhenProfessionalNotFound() {
 
         CreateAppointmentRequest request = new CreateAppointmentRequest(
-            1L,
-            2L,
-            OffsetDateTime.parse("2026-08-15T14:00:00Z"));
+                1L,
+                2L,
+                OffsetDateTime.parse("2026-08-15T14:00:00Z"));
 
         when(professionalRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -87,9 +87,9 @@ class AppointmentServiceTest {
     void shouldThrowWhenPatientNotFound() {
 
         CreateAppointmentRequest request = new CreateAppointmentRequest(
-            1L,
-            2L,
-            OffsetDateTime.parse("2026-08-15T14:00:00Z"));
+                1L,
+                2L,
+                OffsetDateTime.parse("2026-08-15T14:00:00Z"));
 
         User professionalUser = new User("Dra. Ana", "ana@clinica.com", "hash", Role.PROFESSIONAL);
         Professional professional = new Professional(professionalUser, Specialty.GENERAL_SURGERY);
@@ -105,9 +105,9 @@ class AppointmentServiceTest {
     void shouldThrowWhenTimeConflict() {
 
         CreateAppointmentRequest request = new CreateAppointmentRequest(
-            1L,
-            2L,
-            OffsetDateTime.parse("2026-08-15T14:00:00Z"));
+                1L,
+                2L,
+                OffsetDateTime.parse("2026-08-15T14:00:00Z"));
 
         User professionalUser = new User("Dra. Ana", "ana@clinica.com", "hash", Role.PROFESSIONAL);
         Professional professional = new Professional(professionalUser, Specialty.GENERAL_SURGERY);
@@ -119,6 +119,46 @@ class AppointmentServiceTest {
                 .thenReturn(true);
 
         assertThrows(AppointmentConflictException.class,
-             () -> appointmentService.register(request));
+                () -> appointmentService.register(request));
+    }
+
+    @Test
+    void shouldCancelAppointmentWhenValid() {
+
+        User professionalUser = new User("Dra. Ana", "ana@clinica.com", "hash", Role.PROFESSIONAL);
+        Professional professional = new Professional(professionalUser, Specialty.GENERAL_SURGERY);
+        User patient = new User("Carlos", "carlos@paciente.com", "hash", Role.PATIENT);
+
+        Appointment appointment = new Appointment(professional, patient, OffsetDateTime.parse("2026-08-15T14:00:00Z"));
+
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+        when(appointmentRepository.save(appointment)).thenReturn(appointment);
+
+        AppointmentResponse response = appointmentService.cancel(1L);
+
+        assertEquals(AppointmentStatus.CANCELLED, response.status());
+    }
+
+    @Test
+    void shouldThrowWhenAppointmentNotFound() {
+
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AppointmentNotFoundException.class, () -> appointmentService.cancel(1L));
+    }
+
+    @Test
+    void shouldThrowWhenAlreadyCancelled() {
+
+        User professionalUser = new User("Dra. Ana", "ana@clinica.com", "hash", Role.PROFESSIONAL);
+        Professional professional = new Professional(professionalUser, Specialty.GENERAL_SURGERY);
+        User patient = new User("Carlos", "carlos@paciente.com", "hash", Role.PATIENT);
+
+        Appointment appointment = new Appointment(professional, patient, OffsetDateTime.parse("2026-08-15T14:00:00Z"));
+        appointment.cancel();
+
+        when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+        assertThrows(AppointmentAlreadyCancelledException.class, () -> appointmentService.cancel(1L));
     }
 }

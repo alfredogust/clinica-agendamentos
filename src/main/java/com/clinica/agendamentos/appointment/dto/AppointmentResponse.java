@@ -2,6 +2,7 @@ package com.clinica.agendamentos.appointment.dto;
 
 import java.time.OffsetDateTime;
 
+import com.clinica.agendamentos.appointment.AppointmentStatus;
 import com.clinica.agendamentos.professional.dto.ProfessionalResponse;
 import com.clinica.agendamentos.user.dto.UserResponse;
 
@@ -10,5 +11,6 @@ public record AppointmentResponse (
     ProfessionalResponse professional,
     UserResponse patient,
     OffsetDateTime startTime,
-    OffsetDateTime createdAt
+    OffsetDateTime createdAt,
+    AppointmentStatus status
 ) {}

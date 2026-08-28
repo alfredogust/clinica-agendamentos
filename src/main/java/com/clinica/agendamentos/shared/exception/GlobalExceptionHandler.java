@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.clinica.agendamentos.appointment.AppointmentAlreadyCancelledException;
 import com.clinica.agendamentos.appointment.AppointmentConflictException;
 import com.clinica.agendamentos.appointment.AppointmentNotFoundException;
+import com.clinica.agendamentos.auth.InvalidCredentialsException;
 import com.clinica.agendamentos.professional.ProfessionalNotFoundException;
 import com.clinica.agendamentos.user.EmailAlreadyExistsException;
 import com.clinica.agendamentos.user.UserNotFoundException;
@@ -56,7 +57,7 @@ public class GlobalExceptionHandler {
         return conflict(ex.getMessage());
     }
 
-     @ExceptionHandler(AppointmentNotFoundException.class)
+    @ExceptionHandler(AppointmentNotFoundException.class)
     public ResponseEntity<ApiError> handleAppointmentNotFound(AppointmentNotFoundException ex) {
         return notFound(ex.getMessage());
     }
@@ -64,6 +65,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppointmentAlreadyCancelledException.class)
     public ResponseEntity<ApiError> handleAppointmentAlreadyCancelled(AppointmentAlreadyCancelledException ex) {
         return conflict(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCredentials(InvalidCredentialsException ex) {
+        return unauthorized(ex.getMessage());
+    }
+
+    private ResponseEntity<ApiError> unauthorized(String message) {
+        ApiError error = new ApiError(Instant.now(), HttpStatus.UNAUTHORIZED.value(), message, List.of());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     private ResponseEntity<ApiError> conflict(String message) {

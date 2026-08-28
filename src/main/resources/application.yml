@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/clinica
     username: clinica
-    password: clinica_dev_password
+    password: ${DB_PASSWORD:clinica_dev_password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -21,3 +21,7 @@ management:
   endpoint:
     health:
       show-details: always
+
+jwt:
+  secret: ${JWT_SECRET:dev-secret-key-change-in-production-must-be-long-enough-256-bits}
+  expiration: 3600000
